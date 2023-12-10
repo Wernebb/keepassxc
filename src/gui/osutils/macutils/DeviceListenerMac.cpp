@@ -66,13 +66,13 @@ void DeviceListenerMac::registerHotplugCallback(bool arrived, bool left, int ven
 
     QPointer that = this;
     if (arrived) {
-        IOHIDManagerRegisterDeviceMatchingCallback(m_mgr, [](void* that, IOReturn, void*, IOHIDDeviceRef device) {
-            static_cast<DeviceListenerMac*>(that)->onDeviceStateChanged(true, device);
+        IOHIDManagerRegisterDeviceMatchingCallback(m_mgr, [](void* ctx, IOReturn, void*, IOHIDDeviceRef device) {
+            static_cast<DeviceListenerMac*>(ctx)->onDeviceStateChanged(true, device);
         }, that);
     }
     if (left) {
-        IOHIDManagerRegisterDeviceRemovalCallback(m_mgr, [](void* that, IOReturn, void*, IOHIDDeviceRef device) {
-            static_cast<DeviceListenerMac*>(that)->onDeviceStateChanged(true, device);
+        IOHIDManagerRegisterDeviceRemovalCallback(m_mgr, [](void* ctx, IOReturn, void*, IOHIDDeviceRef device) {
+            static_cast<DeviceListenerMac*>(ctx)->onDeviceStateChanged(true, device);
         }, that);
     }
 

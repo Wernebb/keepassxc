@@ -146,8 +146,7 @@ void DatabaseOpenWidget::showEvent(QShowEvent* event)
     m_hideTimer.stop();
 
 #ifdef WITH_XC_YUBIKEY
-//constexpr int vid = 0x1050; // Yubico vendor ID
-    constexpr int vid = 0x0e0f; // Yubico vendor ID
+    constexpr int vid = 0x1050; // Yubico vendor ID
     m_deviceListener.registerHotplugCallback(true, true, vid);
 #endif
 }

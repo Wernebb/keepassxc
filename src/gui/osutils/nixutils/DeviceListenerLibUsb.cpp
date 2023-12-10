@@ -25,9 +25,6 @@ DeviceListenerLibUsb::DeviceListenerLibUsb(QObject* parent)
     , m_ctx(nullptr)
     , m_callbackRef(0)
 {
-    if (libusb_init(reinterpret_cast<libusb_context**>(&m_ctx)) != LIBUSB_SUCCESS) {
-        qWarning("Unable to initialize libusb. USB devices may not be detected properly.");
-    }
 }
 
 DeviceListenerLibUsb::~DeviceListenerLibUsb()
@@ -41,7 +38,10 @@ DeviceListenerLibUsb::~DeviceListenerLibUsb()
 void DeviceListenerLibUsb::registerHotplugCallback(bool arrived, bool left, int vendorId, int productId)
 {
     if (!m_ctx) {
-        return;
+        if (libusb_init(reinterpret_cast<libusb_context**>(&m_ctx)) != LIBUSB_SUCCESS) {
+            qWarning("Unable to initialize libusb. USB devices may not be detected properly.");
+            return;
+        }
     }
 
     if (m_callbackRef) {
@@ -58,26 +58,25 @@ void DeviceListenerLibUsb::registerHotplugCallback(bool arrived, bool left, int 
         events |= LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT;
     }
 
-    libusb_hotplug_callback_handle handle;
     const QPointer that = this;
-    m_callbackRef = libusb_hotplug_register_callback(
+    const int ret = libusb_hotplug_register_callback(
         static_cast<libusb_context*>(m_ctx),
         events,
         0,
         vendorId,
         productId,
         LIBUSB_HOTPLUG_MATCH_ANY,
-        [](libusb_context* ctx, libusb_device* device, libusb_hotplug_event event, void* that) -> int {
-            if (!that) {
+        [](libusb_context* ctx, libusb_device* device, libusb_hotplug_event event, void* ctx) -> int {
+            if (!ctx) {
                 return 0;
             }
-            emit static_cast<DeviceListenerLibUsb*>(that)->devicePlugged(
+            emit static_cast<DeviceListenerLibUsb*>(ctx)->devicePlugged(
                 event == LIBUSB_HOTPLUG_EVENT_DEVICE_ARRIVED, ctx, device);
             return 0;
         },
         that,
-        &handle);
-    if (m_callbackRef != LIBUSB_SUCCESS) {
+        &m_callbackRef);
+    if (ret != LIBUSB_SUCCESS) {
         qWarning("Failed to register USB listener callback.");
         m_callbackRef = 0;
     }

@@ -27,7 +27,7 @@ class ScreenLockListenerWin : public ScreenLockListenerPrivate, public QAbstract
 {
     Q_OBJECT
 public:
-    explicit ScreenLockListenerWin(QWidget* parent = nullptr);
+    explicit ScreenLockListenerWin(QObject* parent = nullptr);
     ~ScreenLockListenerWin();
     bool nativeEventFilter(const QByteArray& eventType, void* message, long*) override;
 

@@ -22,7 +22,11 @@
 #include <QScopedPointer>
 #include <QTimer>
 
+#include "config-keepassx.h"
 #include "gui/DialogyWidget.h"
+#ifdef WITH_XC_YUBIKEY
+#include "osutils/DeviceListener.h"
+#endif
 
 class CompositeKey;
 class Database;
@@ -78,6 +82,9 @@ private slots:
     void openKeyFileHelp();
 
 private:
+#ifdef WITH_XC_YUBIKEY
+    DeviceListener m_deviceListener;
+#endif
     bool m_pollingHardwareKey = false;
     bool m_blockQuickUnlock = false;
     bool m_unlockingDatabase = false;

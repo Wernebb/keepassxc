@@ -25,7 +25,7 @@
  * See https://msdn.microsoft.com/en-us/library/aa383841(v=vs.85).aspx
  * See https://blogs.msdn.microsoft.com/oldnewthing/20060104-50/?p=32783
  */
-ScreenLockListenerWin::ScreenLockListenerWin(QWidget* parent)
+ScreenLockListenerWin::ScreenLockListenerWin(QObject* parent)
     : ScreenLockListenerPrivate(parent)
     , QAbstractNativeEventFilter()
 {

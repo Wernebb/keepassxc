@@ -19,7 +19,6 @@
 #include "DatabaseOpenWidget.h"
 #include "ui_DatabaseOpenWidget.h"
 
-#include "config-keepassx.h"
 #include "gui/FileDialog.h"
 #include "gui/Icons.h"
 #include "gui/MainWindow.h"
@@ -90,6 +89,10 @@ DatabaseOpenWidget::DatabaseOpenWidget(QWidget* parent)
     connect(m_ui->buttonBox, SIGNAL(accepted()), SLOT(openDatabase()));
     connect(m_ui->buttonBox, SIGNAL(rejected()), SLOT(reject()));
 
+#ifdef WITH_XC_YUBIKEY
+    connect(&m_deviceListener, SIGNAL(devicePlugged(bool, void*, void*)), this, SLOT(pollHardwareKey()));
+#endif
+
     m_ui->hardwareKeyLabelHelp->setIcon(icons()->icon("system-help").pixmap(QSize(12, 12)));
     connect(m_ui->hardwareKeyLabelHelp, SIGNAL(clicked(bool)), SLOT(openHardwareKeyHelp()));
     m_ui->keyFileLabelHelp->setIcon(icons()->icon("system-help").pixmap(QSize(12, 12)));
@@ -141,6 +144,12 @@ void DatabaseOpenWidget::showEvent(QShowEvent* event)
         m_ui->editPassword->setFocus();
     }
     m_hideTimer.stop();
+
+#ifdef WITH_XC_YUBIKEY
+//constexpr int vid = 0x1050; // Yubico vendor ID
+    constexpr int vid = 0x0e0f; // Yubico vendor ID
+    m_deviceListener.registerHotplugCallback(true, true, vid);
+#endif
 }
 
 void DatabaseOpenWidget::hideEvent(QHideEvent* event)
@@ -151,6 +160,10 @@ void DatabaseOpenWidget::hideEvent(QHideEvent* event)
     if (!isVisible()) {
         m_hideTimer.start();
     }
+
+#ifdef WITH_XC_YUBIKEY
+    m_deviceListener.deregisterHotplugCallback();
+#endif
 }
 
 bool DatabaseOpenWidget::unlockingDatabase()
@@ -186,13 +199,8 @@ void DatabaseOpenWidget::load(const QString& filename)
     }
 
 #ifdef WITH_XC_YUBIKEY
-    // Only auto-poll for hardware keys if we previously used one with this database file
-    if (config()->get(Config::RememberLastKeyFiles).toBool()) {
-        auto lastChallengeResponse = config()->get(Config::LastChallengeResponse).toHash();
-        if (lastChallengeResponse.contains(m_filename)) {
-            pollHardwareKey();
-        }
-    }
+    // Do initial auto-poll
+    pollHardwareKey();
 #endif
 }
 

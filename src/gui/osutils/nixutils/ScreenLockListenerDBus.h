@@ -24,7 +24,7 @@ class ScreenLockListenerDBus : public ScreenLockListenerPrivate
 {
     Q_OBJECT
 public:
-    explicit ScreenLockListenerDBus(QWidget* parent = nullptr);
+    explicit ScreenLockListenerDBus(QObject* parent = nullptr);
 
 private slots:
     void gnomeSessionStatusChanged(uint status);

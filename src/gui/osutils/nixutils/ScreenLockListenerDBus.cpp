@@ -21,7 +21,7 @@
 #include <QDebug>
 #include <QProcessEnvironment>
 
-ScreenLockListenerDBus::ScreenLockListenerDBus(QWidget* parent)
+ScreenLockListenerDBus::ScreenLockListenerDBus(QObject* parent)
     : ScreenLockListenerPrivate(parent)
 {
     QDBusConnection sessionBus = QDBusConnection::sessionBus();

@@ -23,10 +23,10 @@ class ScreenLockListenerPrivate : public QObject
 {
     Q_OBJECT
 public:
-    static ScreenLockListenerPrivate* instance(QWidget* parent = nullptr);
+    static ScreenLockListenerPrivate* instance(QObject* parent = nullptr);
 
 protected:
-    ScreenLockListenerPrivate(QWidget* parent = nullptr);
+    explicit ScreenLockListenerPrivate(QObject* parent = nullptr);
 
 signals:
     void screenLocked();

@@ -18,7 +18,7 @@
 #include "ScreenLockListener.h"
 #include "ScreenLockListenerPrivate.h"
 
-ScreenLockListener::ScreenLockListener(QWidget* parent)
+ScreenLockListener::ScreenLockListener(QObject* parent)
     : QObject(parent)
 {
     m_listener = ScreenLockListenerPrivate::instance(parent);
